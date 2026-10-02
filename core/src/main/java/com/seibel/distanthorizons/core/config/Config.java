@@ -953,6 +953,7 @@ public class Config
 					
 					public static ConfigEntry<EDhApiRenderingEngine> renderingEngine = new ConfigEntry.Builder<EDhApiRenderingEngine>()
 						.set(EDhApiRenderingEngine.AUTO)
+						.addListener(RenderingEngineConfigListener.INSTANCE)
 						.comment(""
 							+ "Requires a restart to change. \n"
 							+ " \n"

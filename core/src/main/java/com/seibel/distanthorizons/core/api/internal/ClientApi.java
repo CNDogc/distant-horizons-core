@@ -22,6 +22,7 @@ package com.seibel.distanthorizons.core.api.internal;
 import com.seibel.distanthorizons.api.DhApi;
 import com.seibel.distanthorizons.api.enums.config.EDhApiMcRenderingFadeMode;
 import com.seibel.distanthorizons.api.enums.rendering.EDhApiRenderPass;
+import com.seibel.distanthorizons.api.interfaces.render.renderDef.AbstractDhApiRenderDefinition;
 import com.seibel.distanthorizons.api.methods.events.abstractEvents.*;
 import com.seibel.distanthorizons.core.api.internal.rendering.DhRenderState;
 import com.seibel.distanthorizons.core.dependencyInjection.ModAccessorInjector;
@@ -33,7 +34,7 @@ import com.seibel.distanthorizons.core.network.messages.MessageRegistry;
 import com.seibel.distanthorizons.core.pos.DhChunkPos;
 import com.seibel.distanthorizons.core.render.CameraZoom;
 import com.seibel.distanthorizons.core.render.DhApiRenderProxy;
-import com.seibel.distanthorizons.core.render.RenderParams;
+import com.seibel.distanthorizons.core.render.RenderParam;
 import com.seibel.distanthorizons.core.render.RenderThreadTaskHandler;
 import com.seibel.distanthorizons.core.render.renderer.*;
 import com.seibel.distanthorizons.core.util.KeyCodesUtil;
@@ -46,9 +47,9 @@ import com.seibel.distanthorizons.core.wrapperInterfaces.IVersionConstants;
 import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IMinecraftRenderWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IImmersivePortalsAccessor;
 import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IIrisAccessor;
-import com.seibel.distanthorizons.core.wrapperInterfaces.render.renderPass.IDhMetaRenderer;
-import com.seibel.distanthorizons.core.wrapperInterfaces.render.renderPass.IDhVanillaFadeRenderer;
-import com.seibel.distanthorizons.core.wrapperInterfaces.render.renderPass.IDhTestTriangleRenderer;
+import com.seibel.distanthorizons.api.interfaces.render.renderDef.IDhApiMetaRenderer;
+import com.seibel.distanthorizons.api.interfaces.render.renderDef.IDhApiVanillaFadeRenderer;
+import com.seibel.distanthorizons.api.interfaces.render.renderDef.IDhApiTestTriangleRenderer;
 import com.seibel.distanthorizons.coreapi.DependencyInjection.ApiEventInjector;
 import com.seibel.distanthorizons.core.config.Config;
 import com.seibel.distanthorizons.core.network.messages.AbstractNetworkMessage;
@@ -112,7 +113,7 @@ public class ClientApi
 	 * static variable so we don't have to re-create it each frame,
 	 * reducing GC pressure.
 	 */
-	private static final RenderParams RENDER_PARAMS = new RenderParams();
+	private static final RenderParam RENDER_PARAMS = new RenderParam();
 	
 	/**
 	 * 50ms = 20 FPS
@@ -628,8 +629,8 @@ public class ClientApi
 				{
 					if (!renderingDeferredLayer)
 					{
-						IDhMetaRenderer metaRenderer = SingletonInjector.INSTANCE.get(IDhMetaRenderer.class);
-						IDhTestTriangleRenderer testRenderer = SingletonInjector.INSTANCE.get(IDhTestTriangleRenderer.class);
+						IDhApiMetaRenderer metaRenderer = RENDER_PARAMS.renderDefinition.getMetaRenderer();
+						IDhApiTestTriangleRenderer testRenderer = RENDER_PARAMS.renderDefinition.getTestTriangleRenderer();
 						if (testRenderer != null
 							&& metaRenderer != null)
 						{
@@ -643,7 +644,7 @@ public class ClientApi
 						}
 						else
 						{
-							RATE_LIMITED_LOGGER.warn("Unable to find singleton [" + IDhTestTriangleRenderer.class.getSimpleName() + "]");
+							RATE_LIMITED_LOGGER.warn("Unable to find singleton [" + IDhApiTestTriangleRenderer.class.getSimpleName() + "]");
 						}
 					}
 				}
@@ -678,7 +679,7 @@ public class ClientApi
 	 */
 	public void renderFadeOpaque()
 	{
-		IDhVanillaFadeRenderer fadeRenderer = SingletonInjector.INSTANCE.get(IDhVanillaFadeRenderer.class);
+		IDhApiVanillaFadeRenderer fadeRenderer = tryGetVanillaFadeRenderer();
 		if (fadeRenderer == null)
 		{
 			return;
@@ -706,7 +707,7 @@ public class ClientApi
 	 */
 	public void renderFadeTransparent()
 	{
-		IDhVanillaFadeRenderer fadeRenderer = SingletonInjector.INSTANCE.get(IDhVanillaFadeRenderer.class);
+		IDhApiVanillaFadeRenderer fadeRenderer = tryGetVanillaFadeRenderer();
 		if (fadeRenderer == null)
 		{
 			return;
@@ -729,6 +730,19 @@ public class ClientApi
 				fadeRenderer.render(RENDER_PARAMS);
 			}
 		}
+	}
+	@Nullable
+	private static IDhApiVanillaFadeRenderer tryGetVanillaFadeRenderer()
+	{
+		// the definition may be null if we're in the middle of
+		// changing it, or if there was an issue
+		AbstractDhApiRenderDefinition renderDef = RENDER_PARAMS.renderDefinition;
+		if (renderDef == null)
+		{
+			return null;
+		}
+		
+		return renderDef.getVanillaFadeRenderer();
 	}
 	
 	private static boolean shouldRenderFade()

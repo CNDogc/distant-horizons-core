@@ -17,14 +17,23 @@
  *    along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.seibel.distanthorizons.core.wrapperInterfaces.render.renderPass;
+package com.seibel.distanthorizons.api.interfaces.render.renderDef;
 
-import com.seibel.distanthorizons.core.render.RenderParams;
-import com.seibel.distanthorizons.coreapi.interfaces.dependencyInjection.IBindable;
+import com.seibel.distanthorizons.api.methods.events.sharedParameterObjects.DhApiRenderParam;
 
-public interface IDhTestTriangleRenderer extends IBindable
+/**
+ * Can be used alongside {@link IDhApiMetaRenderer} as
+ * a proof-of-concept renderer to make sure
+ * DH's renderer is working properly. <Br><Br>
+ * 
+ * The "GL triangle" should render behind vanilla terrain
+ * just like DH's normal rendering does.
+ *
+ * @since API 7.3.0
+ * @version 2026-10-02
+ */
+public interface IDhApiTestTriangleRenderer
 {
-	
-	void render(RenderParams renderParams);
+	void render(DhApiRenderParam renderParams);
 	
 }

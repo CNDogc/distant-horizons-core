@@ -1,6 +1,6 @@
 package com.seibel.distanthorizons.core.file.fullDatafile.V2;
 
-import com.seibel.distanthorizons.api.enums.worldGeneration.EDhApiDistantGeneratorMode;
+import com.seibel.distanthorizons.api.interfaces.render.renderDef.IDhApiDebugWireframeRenderer;
 import com.seibel.distanthorizons.core.config.Config;
 import com.seibel.distanthorizons.core.dataObjects.fullData.sources.FullDataSourceV2;
 import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
@@ -13,7 +13,7 @@ import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.pos.DhSectionPos;
 import com.seibel.distanthorizons.core.pos.blockPos.DhBlockPos;
-import com.seibel.distanthorizons.core.render.renderer.AbstractDebugWireframeRenderer;
+import com.seibel.distanthorizons.core.render.renderer.DebugWireframeHandler;
 import com.seibel.distanthorizons.core.render.renderer.IDebugRenderable;
 import com.seibel.distanthorizons.core.sql.DbConnectionClosedException;
 import com.seibel.distanthorizons.core.util.ExceptionUtil;
@@ -729,13 +729,13 @@ public class FullDataUpdatePropagatorV2 implements IDebugRenderable, AutoCloseab
 	//region
 	
 	@Override
-	public void debugRender(AbstractDebugWireframeRenderer renderer)
+	public void debugRender(IDhApiDebugWireframeRenderer renderer)
 	{
 		this.updatingPosSet
-				.forEach((pos) -> { renderer.renderBox(new AbstractDebugWireframeRenderer.Box(pos, -32f, 80f, 0.20f, Color.MAGENTA)); });
+				.forEach((pos) -> { renderer.renderBox(new DebugWireframeHandler.Box(pos, -32f, 80f, 0.20f, Color.MAGENTA)); });
 		
 		this.generatingPosSet
-				.forEach((pos) -> { renderer.renderBox(new AbstractDebugWireframeRenderer.Box(pos, -32f, 80f, 0.20f, Color.CYAN)); });
+				.forEach((pos) -> { renderer.renderBox(new DebugWireframeHandler.Box(pos, -32f, 80f, 0.20f, Color.CYAN)); });
 	}
 	
 	@Override

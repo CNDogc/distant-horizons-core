@@ -23,6 +23,7 @@ import com.seibel.distanthorizons.api.enums.worldGeneration.EDhApiDistantGenerat
 import com.seibel.distanthorizons.api.enums.worldGeneration.EDhApiGeneratorPlan;
 import com.seibel.distanthorizons.api.interfaces.override.worldGenerator.IDhApiWorldGenerator;
 import com.seibel.distanthorizons.api.enums.worldGeneration.EDhApiWorldGeneratorReturnType;
+import com.seibel.distanthorizons.api.interfaces.render.renderDef.IDhApiDebugWireframeRenderer;
 import com.seibel.distanthorizons.api.objects.data.DhApiChunk;
 import com.seibel.distanthorizons.api.objects.data.IDhApiFullDataSource;
 import com.seibel.distanthorizons.core.dataObjects.fullData.sources.FullDataSourceV2;
@@ -38,7 +39,7 @@ import com.seibel.distanthorizons.core.pos.DhChunkPos;
 import com.seibel.distanthorizons.core.pos.DhSectionPos;
 import com.seibel.distanthorizons.core.config.Config;
 import com.seibel.distanthorizons.core.dataObjects.transformers.LodDataBuilder;
-import com.seibel.distanthorizons.core.render.renderer.AbstractDebugWireframeRenderer;
+import com.seibel.distanthorizons.core.render.renderer.DebugWireframeHandler;
 import com.seibel.distanthorizons.core.render.renderer.IDebugRenderable;
 import com.seibel.distanthorizons.core.util.ExceptionUtil;
 import com.seibel.distanthorizons.core.util.LodUtil.AssertFailureException;
@@ -64,7 +65,7 @@ public class WorldGenerationQueue implements IFullDataSourceRetrievalQueue, IDeb
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
 	private static final IWrapperFactory WRAPPER_FACTORY = SingletonInjector.INSTANCE.get(IWrapperFactory.class);
-	private static final AbstractDebugWireframeRenderer DEBUG_RENDERER = SingletonInjector.INSTANCE.get(AbstractDebugWireframeRenderer.class);
+	private static final DebugWireframeHandler DEBUG_RENDERER = SingletonInjector.INSTANCE.get(DebugWireframeHandler.class);
 	
 	
 	private final IDhApiWorldGenerator generator;
@@ -662,7 +663,7 @@ public class WorldGenerationQueue implements IFullDataSourceRetrievalQueue, IDeb
 	//region debug
 	
 	@Override
-	public void debugRender(AbstractDebugWireframeRenderer renderer)
+	public void debugRender(IDhApiDebugWireframeRenderer renderer)
 	{
 		int levelMinY = this.level.getLevelWrapper().getMinHeight();
 		int levelMaxY = this.level.getLevelWrapper().getMaxHeight();
@@ -677,7 +678,7 @@ public class WorldGenerationQueue implements IFullDataSourceRetrievalQueue, IDeb
 		this.waitingTaskByPos.keySet().forEach((Long pos) -> 
 		{ 
 			renderer.renderBox(
-				new AbstractDebugWireframeRenderer.Box(pos, levelMinY, maxY, 0.05f, Color.blue)
+				new DebugWireframeHandler.Box(pos, levelMinY, maxY, 0.05f, Color.blue)
 			); 
 		});
 		
@@ -685,7 +686,7 @@ public class WorldGenerationQueue implements IFullDataSourceRetrievalQueue, IDeb
 		this.inProgressGenTasksByLodPos.forEach((Long pos, DataSourceRetrievalTask task) -> 
 		{ 
 			renderer.renderBox(
-				new AbstractDebugWireframeRenderer.Box(pos, levelMinY, maxY, 0.05f, Color.red)
+				new DebugWireframeHandler.Box(pos, levelMinY, maxY, 0.05f, Color.red)
 			); 
 		});
 	}

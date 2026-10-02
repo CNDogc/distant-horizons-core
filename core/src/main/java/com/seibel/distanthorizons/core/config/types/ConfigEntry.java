@@ -139,7 +139,9 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 	//===============//
 	//region
 	
-	public void setApiValue(T newApiValue, String apiUser)
+	public void setApiValue(T newApiValue, String apiUser) { this.setApiValue(newApiValue, apiUser, true);  } 
+	public void setApiValueWithoutFiringEvents(T newApiValue, String apiUser) { this.setApiValue(newApiValue, apiUser, false);  }
+	private void setApiValue(T newApiValue, String apiUser, boolean fireEvents)
 	{
 		this.apiValue = newApiValue;
 		if (apiUser != null)
@@ -157,9 +159,12 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 			this.apiValueLastSetMs = System.currentTimeMillis();
 		}
 		
-		synchronized (this.listenerList)
+		if (fireEvents)
 		{
-			this.listenerList.forEach(IConfigListener::onConfigValueSet);
+			synchronized (this.listenerList)
+			{
+				this.listenerList.forEach(IConfigListener::onConfigValueSet);
+			}
 		}
 	}
 	

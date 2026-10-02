@@ -34,7 +34,7 @@ import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.pos.blockPos.DhBlockPos2D;
 import com.seibel.distanthorizons.core.pos.DhChunkPos;
 import com.seibel.distanthorizons.core.render.RenderThreadTaskHandler;
-import com.seibel.distanthorizons.core.render.renderer.AbstractDebugWireframeRenderer;
+import com.seibel.distanthorizons.core.render.renderer.DebugWireframeHandler;
 import com.seibel.distanthorizons.core.sql.repo.AbstractDhRepo;
 import com.seibel.distanthorizons.core.util.objects.Pair;
 import com.seibel.distanthorizons.core.util.threading.ThreadPoolUtil;
@@ -116,8 +116,8 @@ public class SharedApi
 			{
 				ThreadPoolUtil.shutdownThreadPools();
 				
-				// delayed get because SharedApi will be created before the singleton has been bound 
-				AbstractDebugWireframeRenderer debugWireframeRenderer = SingletonInjector.INSTANCE.get(AbstractDebugWireframeRenderer.class);
+				// delayed get because SharedApi will be created before the singleton has been bound
+				DebugWireframeHandler debugWireframeRenderer = SingletonInjector.INSTANCE.get(DebugWireframeHandler.class);
 				debugWireframeRenderer.clearRenderables();
 				
 				if (MC_RENDER != null)
