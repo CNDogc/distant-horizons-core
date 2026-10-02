@@ -138,7 +138,7 @@ public class LodRenderer
 			IDhApiSsaoRenderer ssaoRenderer = renderDefinition.getSsaoRenderer();
 			IDhApiFogRenderer fogRenderer = renderDefinition.getFogRenderer();
 			IDhApiFarFadeRenderer farFadeRenderer = renderDefinition.getFarFadeRenderer();
-			IDhAntiAliasRenderer antiAliasRenderer = renderDefinition.getAntiAliasRenderer();
+			IDhApiAntiAliasRenderer antiAliasRenderer = renderDefinition.getAntiAliasRenderer();
 			IDhApiDebugWireframeRenderer debugWireframeRenderer = renderDefinition.getDebugWireframeRenderer();
 			IDhApiGenericRenderer genericRenderer = renderDefinition.getGenericRenderer();
 			

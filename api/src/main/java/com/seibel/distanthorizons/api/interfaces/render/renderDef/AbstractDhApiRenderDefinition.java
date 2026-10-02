@@ -60,7 +60,7 @@ public abstract class AbstractDhApiRenderDefinition implements IDhApiOverrideabl
 	public abstract IDhApiSsaoRenderer getSsaoRenderer();
 	public abstract IDhApiFogRenderer getFogRenderer();
 	public abstract IDhApiFarFadeRenderer getFarFadeRenderer();
-	public abstract IDhAntiAliasRenderer getAntiAliasRenderer();
+	public abstract IDhApiAntiAliasRenderer getAntiAliasRenderer();
 	public abstract IDhApiDebugWireframeRenderer getDebugWireframeRenderer();
 	public abstract IDhApiVanillaFadeRenderer getVanillaFadeRenderer();
 	public abstract IDhApiTestTriangleRenderer getTestTriangleRenderer();

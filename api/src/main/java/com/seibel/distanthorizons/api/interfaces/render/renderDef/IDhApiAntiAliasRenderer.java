@@ -28,7 +28,7 @@ import com.seibel.distanthorizons.api.methods.events.sharedParameterObjects.DhAp
  * @since API 7.3.0
  * @version 2026-10-02
  */
-public interface IDhAntiAliasRenderer
+public interface IDhApiAntiAliasRenderer
 {
 	void render(DhApiRenderParam renderParams);
 	
