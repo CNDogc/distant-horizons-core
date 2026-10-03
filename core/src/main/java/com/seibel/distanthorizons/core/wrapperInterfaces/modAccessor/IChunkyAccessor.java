@@ -21,8 +21,6 @@ package com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor;
 
 public interface IChunkyAccessor extends IModAccessor
 {
-	boolean isRunning();
-	
 	/** does nothing if the first time setup has already been completed */
 	void tryRunFirstTimeSetup();
 	

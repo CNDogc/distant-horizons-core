@@ -34,6 +34,10 @@ public abstract class AbstractChunkyAccessor implements IChunkyAccessor
 {
 	protected static final DhLogger LOGGER = new DhLoggerBuilder().build();
 	
+	protected static final DhLogger RATE_LIMITED_LOGGER = new DhLoggerBuilder()
+		.maxCountPerSecond(1)
+		.build();
+	
 	private static final ThreadPoolExecutor TIMEOUT_THREAD = ThreadUtil.makeSingleDaemonThreadPool("Chunky Timeout Handler");
 	/** How often we should check if chunky is running. */
 	private static final long TIME_BETWEEN_RUNNING_CHECKS_MS = 1_000L;
@@ -45,7 +49,10 @@ public abstract class AbstractChunkyAccessor implements IChunkyAccessor
 	
 	private final AtomicBoolean timeoutThreadRunningRef = new AtomicBoolean(false);
 	private final AtomicLong lastChunkyRunMsRef = new AtomicLong(0L);
-	private final AtomicBoolean chunkyRunningRef = new AtomicBoolean(false);
+	
+	private Object boundChunkyApiObj = null;
+	private boolean chunkyApiEventBound = false;
+	private boolean chunkyApiMissing = false;
 	
 	
 	
@@ -54,7 +61,16 @@ public abstract class AbstractChunkyAccessor implements IChunkyAccessor
 	//==================//
 	//region
 	
-	protected abstract void bindOnGenerationProgressEvent();
+	/**
+	 * @throws IllegalStateException if Chunky isn't bound yet
+	 * @throws NoSuchMethodError if an old version of Chunky is present that doesn't support the API
+	 */
+	protected abstract void bindOnGenerationProgressEvent() throws IllegalStateException, NoSuchMethodError;
+	/**
+	 * @throws IllegalStateException if Chunky isn't bound yet
+	 * @throws NoSuchMethodError if an old version of Chunky is present that doesn't support the API
+	 */
+	protected abstract Object getOrThrowChunkyApiObject() throws IllegalStateException, NoSuchMethodError;
 	
 	//endregion
 	
@@ -66,20 +82,61 @@ public abstract class AbstractChunkyAccessor implements IChunkyAccessor
 	//region
 	
 	@Override
-	public boolean isRunning() { return this.chunkyRunningRef.get(); }
-	
-	
-	private boolean listenerBound = false;
-	@Override
 	public void tryRunFirstTimeSetup()
 	{
-		if (this.listenerBound)
+		if (this.chunkyApiMissing)
 		{
 			return;
 		}
-		this.listenerBound = true;
 		
-		this.bindOnGenerationProgressEvent();
+		// we need to re-bind our listener every time the Chunky API changes
+		// so if our bound object reference changes, try re-binding
+		Object currentChunkyApiObj = this.tryGetChunkyApiObject();
+		if (this.boundChunkyApiObj != null
+			&& this.boundChunkyApiObj == currentChunkyApiObj
+			&& this.chunkyApiEventBound)
+		{
+			// event has been bound
+			return;
+		}
+		
+		try
+		{
+			// this will throw an exception if chunky isn't bound yet
+			// (shouldn't happen at this point, but just in case)
+			this.bindOnGenerationProgressEvent();
+			
+			this.boundChunkyApiObj = currentChunkyApiObj;
+			this.chunkyApiEventBound = true;
+		}
+		catch (Exception e)
+		{
+			this.boundChunkyApiObj = null;
+			this.chunkyApiEventBound = false;
+			
+			//RATE_LIMITED_LOGGER.info("Failed to bind Chunky API, error: ["+e.getMessage()+"]");
+		}
+	}
+	private Object tryGetChunkyApiObject()
+	{
+		try
+		{
+			// this will throw an exception if Chunky hasn't been bound yet
+			return this.getOrThrowChunkyApiObject();
+		}
+		catch (Exception e)
+		{
+			//RATE_LIMITED_LOGGER.info("Failed to get Chunky API, error: ["+e.getMessage()+"]");
+			return null;
+		}
+		catch (Error e) // probably NoSuchMethodError
+		{
+			LOGGER.error("Unable to get Chunky API, error: ["+e.getMessage()+"]. Updating chunky may resolve the problem.", e);
+			
+			Config.Common.WorldGenerator.generatorPlan.setApiValue(EDhApiGeneratorPlan.DISABLED, ModInfo.READABLE_NAME + " / Chunky");
+			this.chunkyApiMissing = true;
+			return null;
+		}
 	}
 	
 	/** 
