@@ -31,8 +31,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * This config type allows for entering text, number, or enum values.
@@ -295,7 +293,7 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 	//region
 	
 	/** Fired whenever the config value changes to a new value. */
-	public void addValueChangeListener(Consumer<T> onValueChangeFunc)
+	public void addValueChangeListener(ConfigChangeListener.OnChangeFunc<T> onValueChangeFunc)
 	{
 		ConfigChangeListener<T> changeListener = new ConfigChangeListener<>(this, onValueChangeFunc);
 		this.addListener(changeListener);
