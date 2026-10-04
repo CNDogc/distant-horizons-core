@@ -487,7 +487,7 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 			return this;
 		}
 		
-		public Builder<T> setShowEnumOptionFunc(IShowEnumOptionFunc func)
+		public Builder<T> setShowEnumOptionFunc(IShowEnumOptionFunc<T> func)
 		{
 			this.tmpShowEnumOptionFunc = func;
 			return this;
@@ -551,9 +551,9 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 	//region
 	
 	@FunctionalInterface
-	public interface IShowEnumOptionFunc
+	public interface IShowEnumOptionFunc<T>
 	{
-		boolean shouldShowEnum(Enum<?> enumValue);
+		boolean shouldShowEnum(T enumValue);
 	}
 	
 	//endregion

@@ -1439,8 +1439,8 @@ public class Config
 			public static ConfigEntry<EDhApiGeneratorPlan> generatorPlan = new ConfigEntry.Builder<EDhApiGeneratorPlan>()
 				.setChatCommandName("generation.plan")
 				.set(EDhApiGeneratorPlan.SURFACE_THEN_CHUNKS)
-				.setShowEnumOptionFunc(WorldGenPlanConfigEventHandler::setShowEnumOptionFunc)
 				.addListener(WorldGenPlanConfigEventHandler.INSTANCE)
+				.setShowEnumOptionFunc(WorldGenPlanConfigEventHandler.INSTANCE)
 				.comment(""
 					+ "Defines how LODs will be generated \n"
 					+ "outside the vanilla render distance. \n"
