@@ -59,7 +59,14 @@ private static final IMinecraftRenderWrapper MC_RENDER = SingletonInjector.INSTA
 	{
 		RenderThreadTaskHandler.INSTANCE.queueRunningOnRenderThread("Config Render Engine Change", () -> 
 		{
-			DEPENDENCY_SETUP.setRenderingApiBindingsFromConfigAsync();
+			try
+			{
+				DEPENDENCY_SETUP.setRenderingApiBindingsFromConfigAsync();
+			}
+			catch (Exception e)
+			{
+				LOGGER.warn(e.getMessage(), e);
+			}
 		});
 	}
 	

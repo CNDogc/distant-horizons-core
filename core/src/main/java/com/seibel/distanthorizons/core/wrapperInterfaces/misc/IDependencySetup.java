@@ -8,7 +8,7 @@ import java.util.concurrent.CompletableFuture;
 
 public interface IDependencySetup extends IBindable
 {
-	void setRenderingApiBindingsFromConfigAsync();
+	CompletableFuture<String> setRenderingApiBindingsFromConfigAsync() throws Exception;
 	
 	/** Will run at the beginning of the next frame. */
 	CompletableFuture<String> trySetRenderDefinitionAsync(AbstractDhApiRenderDefinition renderDefinition, EDhApiRenderingEngine renderingApiEnum, String apiUserDisplayName);
