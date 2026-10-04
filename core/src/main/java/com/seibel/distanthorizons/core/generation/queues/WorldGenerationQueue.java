@@ -249,7 +249,7 @@ public class WorldGenerationQueue implements IFullDataSourceRetrievalQueue, IDeb
 			try
 			{
 				this.generator.preGeneratorTaskStart();
-			
+				
 				// queue generation tasks until the generator is full, or there are no more tasks to generate
 				boolean taskStarted = true;
 				while (!this.isGeneratorBusy()
@@ -323,7 +323,7 @@ public class WorldGenerationQueue implements IFullDataSourceRetrievalQueue, IDeb
 		if (this.canGenerateDetailLevel(DhSectionPos.getDetailLevel(closestTask.pos)))
 		{
 			// detail level is correct for generation, start generation
-			
+				
 			DataSourceRetrievalTask existingTask = this.inProgressGenTasksByLodPos.get(closestTask.pos);
 			if (existingTask == null)
 			{
@@ -357,7 +357,7 @@ public class WorldGenerationQueue implements IFullDataSourceRetrievalQueue, IDeb
 		{
 			// detail level is too high (if the detail level was too low, the generator would've ignored the request),
 			// split up the task
-			
+				
 			closestTask.future.complete(DataSourceRetrievalResult.CreateSplit());
 		}
 		
@@ -397,6 +397,10 @@ public class WorldGenerationQueue implements IFullDataSourceRetrievalQueue, IDeb
 		{
 			try
 			{
+				// failed tasks also need to free their slot,
+				// otherwise isGeneratorBusy() will eventually always return true and this level will stop generating
+				boolean taskRemoved = this.inProgressGenTasksByLodPos.remove(taskPos, worldGenTask);
+				
 				if (exception != null)
 				{
 					// don't log the shutdown exceptions
@@ -412,7 +416,6 @@ public class WorldGenerationQueue implements IFullDataSourceRetrievalQueue, IDeb
 				{
 					fullDataSource.recordLastSeen();
 					
-					boolean taskRemoved = this.inProgressGenTasksByLodPos.remove(taskPos, worldGenTask);
 					LodUtil.assertTrue(taskRemoved, "Unable to find in progress generator task with position ["+DhSectionPos.toString(taskPos)+"]");
 					
 					worldGenTask.future.complete(DataSourceRetrievalResult.CreateSuccess(taskPos, fullDataSource));
@@ -427,7 +430,7 @@ public class WorldGenerationQueue implements IFullDataSourceRetrievalQueue, IDeb
 			{
 				this.tryQueueNewWorldGenRequestsAsync();
 			}
-			
+				
 			return null;
 		});
 	}
@@ -501,31 +504,40 @@ public class WorldGenerationQueue implements IFullDataSourceRetrievalQueue, IDeb
 		chunkGenFuture.thenRun(() ->
 		{
 			FullDataSourceV2 requestedDataSource = FullDataSourceV2.createEmpty(task.pos);
-			
+				
 			// process chunks //
-			for (int i = 0; i < generatedChunks.size(); i++)
+			try
 			{
-				IChunkWrapper chunkWrapper = generatedChunks.get(i);
-				
-				// only light the chunk here if necessary,
-				// lighting before this point is preferred but for legacy API use this
-				// check should be done
-				if (!chunkWrapper.isDhBlockLightingCorrect())
+				for (int i = 0; i < generatedChunks.size(); i++)
 				{
-					ArrayList<IChunkWrapper> nearbyChunkList = new ArrayList<>();
-					nearbyChunkList.add(chunkWrapper);
-					byte maxSkyLight = this.level.getLevelWrapper().hasSkyLight() ? LodUtil.MAX_MC_LIGHT : LodUtil.MIN_MC_LIGHT;
-					DhLightingEngine.INSTANCE.bakeChunkBlockLighting(chunkWrapper, nearbyChunkList, maxSkyLight);
+					IChunkWrapper chunkWrapper = generatedChunks.get(i);
+				
+					// only light the chunk here if necessary,
+					// lighting before this point is preferred but for legacy API use this
+					// check should be done
+					if (!chunkWrapper.isDhBlockLightingCorrect())
+					{
+						ArrayList<IChunkWrapper> nearbyChunkList = new ArrayList<>();
+						nearbyChunkList.add(chunkWrapper);
+						byte maxSkyLight = this.level.getLevelWrapper().hasSkyLight() ? LodUtil.MAX_MC_LIGHT : LodUtil.MIN_MC_LIGHT;
+						DhLightingEngine.INSTANCE.bakeChunkBlockLighting(chunkWrapper, nearbyChunkList, maxSkyLight);
+					}
+				
+					try (FullDataSourceV2 generatedDataSource = LodDataBuilder.createFromChunk(this.level.getLevelWrapper(), chunkWrapper))
+					{
+						LodUtil.assertTrue(generatedDataSource != null);
+						requestedDataSource.updateFromDataSource(generatedDataSource);
+					}
 				}
 				
-				try (FullDataSourceV2 generatedDataSource = LodDataBuilder.createFromChunk(this.level.getLevelWrapper(), chunkWrapper))
-				{
-					LodUtil.assertTrue(generatedDataSource != null);
-					requestedDataSource.updateFromDataSource(generatedDataSource);
-				}
+				returnFuture.complete(requestedDataSource);
 			}
-			
-			returnFuture.complete(requestedDataSource);
+			catch (Throwable e)
+			{
+				// the task has to complete, otherwise it would never free its generation slot
+				requestedDataSource.close();
+				returnFuture.completeExceptionally(e);
+			}
 		});
 		
 		return returnFuture;
@@ -556,22 +568,31 @@ public class WorldGenerationQueue implements IFullDataSourceRetrievalQueue, IDeb
 		{
 			FullDataSourceV2 requestedDataSource = FullDataSourceV2.createEmpty(task.pos);
 			
-			for (int i = 0; i < generatedChunks.size(); i++)
+			try
 			{
-				DhApiChunk apiChunk = generatedChunks.get(i);
+				for (int i = 0; i < generatedChunks.size(); i++)
+				{
+					DhApiChunk apiChunk = generatedChunks.get(i);
 				
-				try(FullDataSourceV2 generatedDataSource = LodDataBuilder.createFromApiChunkData(apiChunk, this.generator.runApiValidation()))
-				{
-					requestedDataSource.updateFromDataSource(generatedDataSource);
+					try(FullDataSourceV2 generatedDataSource = LodDataBuilder.createFromApiChunkData(apiChunk, this.generator.runApiValidation()))
+					{
+						requestedDataSource.updateFromDataSource(generatedDataSource);
+					}
+					catch (DataCorruptedException | IllegalArgumentException e)
+					{
+						LOGGER.error("World generator returned a corrupt API chunk. Error: [" + e.getMessage() + "]. World generator disabled.", e);
+						Config.Common.WorldGenerator.generatorPlan.set(EDhApiGeneratorPlan.DISABLED);
+					}
 				}
-				catch (DataCorruptedException | IllegalArgumentException e)
-				{
-					LOGGER.error("World generator returned a corrupt API chunk. Error: [" + e.getMessage() + "]. World generator disabled.", e);
-					Config.Common.WorldGenerator.generatorPlan.set(EDhApiGeneratorPlan.DISABLED);
-				}
+				
+				returnFuture.complete(requestedDataSource);
 			}
-			
-			returnFuture.complete(requestedDataSource);
+			catch (Throwable e)
+			{
+				// the task has to complete, otherwise it would never free its generation slot
+				requestedDataSource.close();
+				returnFuture.completeExceptionally(e);
+			}
 		});
 		
 		return returnFuture;
