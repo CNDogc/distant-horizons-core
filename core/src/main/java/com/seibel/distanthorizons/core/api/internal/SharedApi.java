@@ -46,6 +46,7 @@ import com.seibel.distanthorizons.core.wrapperInterfaces.world.IClientLevelWrapp
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.ILevelWrapper;
 import com.seibel.distanthorizons.coreapi.DependencyInjection.ApiEventInjector;
 import com.seibel.distanthorizons.core.logging.DhLogger;
+import com.seibel.distanthorizons.coreapi.DependencyInjection.WorldGeneratorInjector;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -132,6 +133,7 @@ public class SharedApi
 				
 				RenderThreadTaskHandler.INSTANCE.clearDebugStats();
 				BlockTextureRegistry.INSTANCE.clear();
+				WorldGeneratorInjector.INSTANCE.clear();
 				
 				// recommend that the garbage collector cleans up any objects from the old world and thread pools
 				System.gc();
