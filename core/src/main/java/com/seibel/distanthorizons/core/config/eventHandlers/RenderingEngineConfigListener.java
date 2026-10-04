@@ -19,18 +19,23 @@
 
 package com.seibel.distanthorizons.core.config.eventHandlers;
 
+import com.seibel.distanthorizons.api.enums.config.EDhApiRenderingApi;
+import com.seibel.distanthorizons.api.enums.config.EDhApiRenderingEngine;
 import com.seibel.distanthorizons.core.config.listeners.IConfigListener;
+import com.seibel.distanthorizons.core.config.types.ConfigEntry;
 import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
 import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.render.RenderThreadTaskHandler;
+import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IMinecraftRenderWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.misc.IDependencySetup;
 
-public class RenderingEngineConfigListener implements IConfigListener
+public class RenderingEngineConfigListener implements IConfigListener, ConfigEntry.IShowEnumOptionFunc<EDhApiRenderingEngine>
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
 	
 	private static final IDependencySetup DEPENDENCY_SETUP = SingletonInjector.INSTANCE.get(IDependencySetup.class);
+private static final IMinecraftRenderWrapper MC_RENDER = SingletonInjector.INSTANCE.get(IMinecraftRenderWrapper.class);
 	
 	public static final RenderingEngineConfigListener INSTANCE = new RenderingEngineConfigListener();
 	
@@ -56,6 +61,19 @@ public class RenderingEngineConfigListener implements IConfigListener
 		{
 			DEPENDENCY_SETUP.setRenderingApiBindingsFromConfigAsync();
 		});
+	}
+	
+	@Override 
+	public boolean shouldShowEnum(EDhApiRenderingEngine enumValue)
+	{
+		EDhApiRenderingApi renderApi = MC_RENDER.getMcRenderingApi();
+		if (renderApi == EDhApiRenderingApi.VULKAN
+			&& enumValue == EDhApiRenderingEngine.OPEN_GL)
+		{
+			return false;
+		}
+		
+		return true;
 	}
 	
 	
