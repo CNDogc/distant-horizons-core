@@ -19,7 +19,7 @@ layout(location = 5) flat out uint vTextureTileId;
 
 layout (std140) uniform vertUniqueUniformBlock
 {
-    vec3 uModelOffset;
+    ivec3 uModelOffset;
 };
 
 layout (std140) uniform vertSharedUniformBlock 
@@ -34,7 +34,8 @@ layout (std140) uniform vertSharedUniformBlock
     float uViewWidth;
     float uViewHeight;
 
-    vec3 uCameraPos;
+    ivec3 uCorseCameraPos;
+    vec3 uFineCameraPos;
     mat4 uCombinedMatrix;
 };
 
@@ -71,7 +72,8 @@ void main()
     vNormalIndex = uint(irisNormal);
     vTextureTileId = textureTile;
     
-    vertexWorldPos = vPosition.xyz + (uModelOffset - uCameraPos);
+    ivec3 relOffset = uModelOffset - uCorseCameraPos; // ints needed for extreme (10 million +) distances
+    vertexWorldPos = vPosition.xyz + (vec3(relOffset) - uFineCameraPos);
     
     float vertexYPos = vPosition.y + uWorldYOffset;
     
