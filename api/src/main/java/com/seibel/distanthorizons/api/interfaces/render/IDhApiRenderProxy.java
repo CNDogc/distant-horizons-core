@@ -25,6 +25,7 @@ import com.seibel.distanthorizons.api.enums.config.EDhApiRenderingApi;
 import com.seibel.distanthorizons.api.enums.config.EDhApiRenderingEngine;
 import com.seibel.distanthorizons.api.interfaces.config.IDhApiConfigValue;
 import com.seibel.distanthorizons.api.interfaces.render.renderDef.AbstractDhApiRenderDefinition;
+import com.seibel.distanthorizons.api.interfaces.world.IDhApiLevelWrapper;
 import com.seibel.distanthorizons.api.methods.events.abstractEvents.DhApiAfterDhInitEvent;
 import com.seibel.distanthorizons.api.objects.DhApiResult;
 
@@ -50,8 +51,25 @@ public interface IDhApiRenderProxy
 	 * Background: <Br>
 	 * When rendering Distant Horizons bakes each block's color into the geometry that's rendered. <Br>
 	 * This improves rendering speed and VRAM size, but prevents dynamically changing LOD colors. <Br>
+	 *     
+	 * @see #reloadRenderDataCache()
 	 */
 	DhApiResult<Boolean> clearRenderDataCache();
+	
+	/**
+	 * Similar to {@link #clearRenderDataCache()} except it doesn't
+	 * delete any currently rendering data. Any currently-rendering data will be replaced
+	 * once the new data has been loaded. <br><br> 
+	 * 
+	 * This allows for less distracting changes vs {@link #clearRenderDataCache()}
+	 * if, for example, you only want to change color/biome data while
+	 * keeping the same {@link EDhApiRenderingEngine}.
+	 * 
+	 * @see #clearRenderDataCache()
+	 * 
+	 * @since API 7.3.0
+	 */
+	DhApiResult<Boolean> reloadRenderDataCache();
 	
 	/**
 	 * Returns which specific {@link EDhApiRenderingApi}

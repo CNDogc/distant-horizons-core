@@ -117,7 +117,7 @@ public class DhClientServerLevel extends AbstractDhServerLevel implements IDhCli
 	public IClientLevelWrapper getClientLevelWrapper() { return MC_CLIENT.getWrappedClientLevel(); }
 	
 	@Override
-	public void clearRenderCache() { this.clientside.clearRenderCache(); }
+	public void clearRenderCache(boolean clearExistingData) { this.clientside.clearRenderCache(clearExistingData); }
 	
 	//endregion
 	

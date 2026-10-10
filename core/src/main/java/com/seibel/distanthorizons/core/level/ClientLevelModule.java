@@ -198,7 +198,7 @@ public class ClientLevelModule implements Closeable, IDataSourceUpdateListenerFu
 	// misc helper functions //
 	//=======================//
 	
-	public void clearRenderCache()
+	public void clearRenderCache(boolean clearExistingData)
 	{
 		IClientLevelWrapper clientLevelWrapper = this.clientLevel.getClientLevelWrapper();
 		if (clientLevelWrapper != null)
@@ -209,7 +209,7 @@ public class ClientLevelModule implements Closeable, IDataSourceUpdateListenerFu
 		ClientRenderState ClientRenderState = this.ClientRenderStateRef.get();
 		if (ClientRenderState != null && ClientRenderState.quadtree != null)
 		{
-			ClientRenderState.quadtree.clearRenderDataCache();
+			ClientRenderState.quadtree.clearRenderDataCache(clearExistingData);
 		}
 	}
 	

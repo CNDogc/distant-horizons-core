@@ -302,7 +302,7 @@ public class DhClientLevel extends AbstractDhLevel implements IDhClientLevel
 	public IClientLevelWrapper getClientLevelWrapper() { return this.levelWrapper; }
 	
 	@Override
-	public void clearRenderCache() { this.clientside.clearRenderCache(); }
+	public void clearRenderCache(boolean clearExistingData) { this.clientside.clearRenderCache(clearExistingData); }
 	
 	@Override
 	@NotNull

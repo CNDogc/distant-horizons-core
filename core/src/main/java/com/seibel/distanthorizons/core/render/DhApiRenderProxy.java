@@ -26,9 +26,11 @@ import com.seibel.distanthorizons.api.enums.config.EDhApiRenderingApi;
 import com.seibel.distanthorizons.api.enums.config.EDhApiRenderingEngine;
 import com.seibel.distanthorizons.api.interfaces.render.IDhApiBlazeTextureWrapper;
 import com.seibel.distanthorizons.api.interfaces.render.IDhApiRenderProxy;
+import com.seibel.distanthorizons.api.interfaces.world.IDhApiLevelWrapper;
 import com.seibel.distanthorizons.api.methods.events.abstractEvents.DhApiEBeforeRenderDataCacheClearEvent;
 import com.seibel.distanthorizons.api.objects.DhApiResult;
 import com.seibel.distanthorizons.core.api.internal.SharedApi;
+import com.seibel.distanthorizons.core.dataObjects.render.textures.BlockTextureRegistry;
 import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
 import com.seibel.distanthorizons.core.level.IDhClientLevel;
 import com.seibel.distanthorizons.core.level.IDhLevel;
@@ -74,7 +76,11 @@ public class DhApiRenderProxy implements IDhApiRenderProxy
 	//=========//
 	
 	@Override
-	public DhApiResult<Boolean> clearRenderDataCache()
+	public DhApiResult<Boolean> clearRenderDataCache() { return this.reloadRenderDataCache(true); }
+	@Override
+	public DhApiResult<Boolean> reloadRenderDataCache() { return this.reloadRenderDataCache(false); }
+		
+	private DhApiResult<Boolean> reloadRenderDataCache(boolean clearExistingData)
 	{
 		// make sure this is a valid time to run the method
 		AbstractDhWorld world = SharedApi.getAbstractDhWorld();
@@ -86,13 +92,16 @@ public class DhApiRenderProxy implements IDhApiRenderProxy
 		
 		DhApi.events.fireAllEvents(DhApiEBeforeRenderDataCacheClearEvent.class, new DhApiEBeforeRenderDataCacheClearEvent.EventParam());
 		
+		// handles both colors and textures
+		BlockTextureRegistry.INSTANCE.clear();
+		
 		// clear the render caches for each level
 		Iterable<? extends IDhLevel> loadedLevels = world.getAllLoadedLevels();
 		for (IDhLevel level : loadedLevels)
 		{
 			if (level instanceof IDhClientLevel)
 			{
-				((IDhClientLevel) level).clearRenderCache();
+				((IDhClientLevel) level).clearRenderCache(clearExistingData);
 			}
 		}
 		

@@ -1283,22 +1283,30 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 	 * Re-creates the color, render data.
 	 * This method should be called after resource packs are changed or LOD settings are modified.
 	 */
-	public void clearRenderDataCache()
+	public void clearRenderDataCache(boolean clearExistingData)
 	{
 		try
 		{
 			this.treeTickLock.lock();
-			LOGGER.info("Disposing render data...");
 			
-			// clear the tree
+			// update each node in the tree
 			Iterator<QuadNode<LodRenderSection>> nodeIterator = this.nodeIterator();
 			while (nodeIterator.hasNext())
 			{
 				QuadNode<LodRenderSection> quadNode = nodeIterator.next();
 				if (quadNode.value != null)
 				{
-					quadNode.value.close();
-					quadNode.value = null;
+					if (clearExistingData)
+					{
+						// delete the old node so it's hard reloaded
+						quadNode.value.close();
+						quadNode.value = null;
+					}
+					else
+					{
+						// mark the node for re-loading
+						quadNode.value.renderDataDirty = true;
+					}
 				}
 			}
 			
