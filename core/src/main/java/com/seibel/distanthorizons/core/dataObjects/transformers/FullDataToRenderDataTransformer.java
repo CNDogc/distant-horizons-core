@@ -363,7 +363,9 @@ public class FullDataToRenderDataTransformer
 			int blockLight = FullDataPointUtil.getBlockLight(fullData);
 			int skyLight = FullDataPointUtil.getSkyLight(fullData);
 			
-			mutableBlockPos.setY(bottomY + levelWrapper.getMinHeight());
+			// using the top Y provides better sampling for biomes and fixes an issue where
+			// cave biomes are used instead of the surface biome
+			mutableBlockPos.setY(topY - 1 + levelWrapper.getMinHeight());
 			
 			IBiomeWrapper biome;
 			IBlockStateWrapper block;
