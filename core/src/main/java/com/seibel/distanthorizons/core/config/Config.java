@@ -30,6 +30,7 @@ import com.seibel.distanthorizons.core.config.eventHandlers.presets.*;
 import com.seibel.distanthorizons.core.config.types.*;
 import com.seibel.distanthorizons.core.config.types.enums.*;
 import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
+import com.seibel.distanthorizons.core.localization.DhLanguageManager;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.pos.DhSectionPos;
 import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IMinecraftClientWrapper;
@@ -61,6 +62,14 @@ public class Config
 		public static ConfigEntry<Boolean> quickEnableRendering = new ConfigEntry.Builder<Boolean>()
 			.set(true)
 			.setAppearance(EConfigEntryAppearance.ONLY_IN_GUI)
+			.build();
+		
+		public static ConfigEntry<String> language = new ConfigEntry.Builder<String>()
+			.set(DhLanguageManager.AUTO)
+			.addListener(LanguageConfigEventHandler.INSTANCE)
+			.comment("Select the display language used by Distant Horizons. \n\n" +
+				"'auto' will follow Minecraft's language setting. \n" +
+				"Any .json files in config/DistantHorizons/lang/ will also be detected.")
 			.build();
 		
 		public static ConfigUiLinkedEntry quickLodChunkRenderDistance = new ConfigUiLinkedEntry(Client.Advanced.Graphics.Quality.lodChunkRenderDistanceRadius);

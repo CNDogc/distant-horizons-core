@@ -69,6 +69,11 @@
   "distanthorizons.config.client.quickEnableRendering.@tooltip":
     "If true, Distant Horizons will render LODs beyond the vanilla render distance.",
   
+  "distanthorizons.config.client.language":
+    "Language",
+  "distanthorizons.config.client.language.@tooltip":
+    "Select the display language used by Distant Horizons. \n\n'auto' will follow Minecraft's language setting. \nCustom language files placed in config/DistantHorizons/lang/ will also be recognized.",
+  
   "distanthorizons.config.client.quickShowWorldGenProgress":
     "Show LOD Gen/Import Progress",
   "distanthorizons.config.client.quickShowWorldGenProgress.@tooltip":

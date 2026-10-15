@@ -22,6 +22,7 @@ package com.seibel.distanthorizons.core.config;
 import com.seibel.distanthorizons.core.config.file.ConfigFileHandler;
 import com.seibel.distanthorizons.core.config.types.*;
 import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
+import com.seibel.distanthorizons.core.localization.DhLanguageManager;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.wrapperInterfaces.config.ILangWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IMinecraftSharedWrapper;
@@ -124,6 +125,7 @@ public class ConfigHandler
 		
 		this.configFileHandler.loadFromFile();
 		this.runMinMaxValidation = !Config.Client.Advanced.Debugging.allowUnsafeValues.get();
+		DhLanguageManager.INSTANCE.setLanguage(Config.Client.language.get());
 		
 		this.isLoaded = true;
 		LOGGER.info("[" + ModInfo.NAME + "] Config initialised");

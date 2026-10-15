@@ -1,0 +1,86 @@
+{
+  "distanthorizons.title":
+    "遥远地平线 (Distant Horizons)",
+
+  "distanthorizons.general.true":
+    "开启",
+  "distanthorizons.general.false":
+    "关闭",
+  "distanthorizons.general.yes":
+    "是",
+  "distanthorizons.general.no":
+    "否",
+  "distanthorizons.general.back":
+    "返回",
+  "distanthorizons.general.next":
+    "下一页",
+  "distanthorizons.general.done":
+    "完成",
+  "distanthorizons.general.cancel":
+    "取消",
+  "distanthorizons.general.reset":
+    "重置",
+  "distanthorizons.general.spacer":
+    "",
+  "distanthorizons.general.apiOverride":
+    "API 锁定",
+  "distanthorizons.general.disabledByApi.@tooltip":
+    "此选项受其他模组通过 DH API 控制，\n无法通过界面或配置文件更改。\n当前控制者：\n",
+  "distanthorizons.general.unsupportedMcVersion":
+    "版本不支持",
+  "distanthorizons.general.unsupportedMcVersion.@tooltip":
+    "DH 在当前 Minecraft 版本下不支持修改此选项。\n配置文件或 API 的设定值将被忽略。",
+
+  "distanthorizons.config.title":
+    "Distant Horizons 选项设置",
+  "distanthorizons.config.client":
+    "客户端设置",
+
+  "distanthorizons.config.client.quickEnableRendering":
+    "启用远景渲染",
+  "distanthorizons.config.client.quickEnableRendering.@tooltip":
+    "开启后，Distant Horizons 将在原版视距之外渲染 LOD 远景。",
+
+  "distanthorizons.config.client.language":
+    "显示语言 (Language)",
+  "distanthorizons.config.client.language.@tooltip":
+    "选择 Distant Horizons 的显示语言。\n\n设置为“跟随游戏”将与 Minecraft 客户端全局语言保持一致。\n放置在 config/DistantHorizons/lang/ 目录下的自定义语言文件也会被自动识别。",
+
+  "distanthorizons.config.client.quickShowWorldGenProgress":
+    "显示远景生成/导入进度",
+  "distanthorizons.config.client.quickShowWorldGenProgress.@tooltip":
+    "开启后，屏幕上将显示远景地图生成或导入的实时进度条。",
+
+  "distanthorizons.config.client.qualityPresetSetting":
+    "渲染画质预设",
+  "distanthorizons.config.client.qualityPresetSetting.@tooltip":
+    "快速调整多项图形设置以改变渲染质量。\n\n若显卡满载或出现掉帧卡顿，请调低此设置。",
+
+  "distanthorizons.config.client.threadPresetSetting":
+    "CPU 负载预设",
+  "distanthorizons.config.client.threadPresetSetting.@tooltip":
+    "修改 Distant Horizons 使用的线程数量。\n\n调高将加快远景生成速度与 LOD 加载速度，但会增加 CPU/内存占用并可能导致卡顿。\n注意：此选项会根据您的 CPU 核心数自动等比例分配负载。",
+
+  "distanthorizons.config.client.optionsButton":
+    "显示设置按钮",
+  "distanthorizons.config.client.optionsButton.@tooltip":
+    "在 Minecraft 视频设置界面的 FOV 滑块旁显示 DH 配置按钮",
+
+  "distanthorizons.config.client.advanced":
+    "高级选项",
+
+  "distanthorizons.config.client.advanced.graphics":
+    "图形与渲染",
+  "distanthorizons.config.client.advanced.worldGenerator":
+    "远景世界生成器",
+  "distanthorizons.config.client.advanced.server":
+    "多玩家与服务器",
+  "distanthorizons.config.client.advanced.autoUpdater":
+    "自动更新器",
+  "distanthorizons.config.client.advanced.debugging":
+    "调试选项",
+  "distanthorizons.config.client.advanced.logging":
+    "日志选项",
+  "distanthorizons.config.client.advanced.buffers":
+    "缓冲区设置"
+}
